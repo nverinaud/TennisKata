@@ -14,12 +14,41 @@ type Tests =
     static member ``Quand il y a Egalite, le joueur qui marque le point prend l'Avantage`` (joueurQuiMarque : Joueur) =
         Avantage joueurQuiMarque = scoreQuandEgalite joueurQuiMarque
 
-    static member ``Quand un joueur a Quarante et que l'autre passe à Quarante, il doit y avoir Egalite`` (quarante : QuaranteInfo) =
+    static member ``Quand un joueur a Quarante et qu'il marque, il doit être désigné Vainqueur`` (quarante : QuaranteInfo) =
         Vainqueur quarante.joueurAvecQuarante = scoreQuandQuarante quarante quarante.joueurAvecQuarante
 
     static member ``Quand un joueur a Quarante et que l'autre passe à Quarante, il doit y avoir Egalite`` (joueurAvecQuarante : Joueur) =
         let quarante = { joueurAvecQuarante = joueurAvecQuarante; pointAutreJoueur = Trente }
         Egalite = scoreQuandQuarante quarante (autre joueurAvecQuarante)
+
+    static member ``Quand un joueur a Quarante et que l'autre a Zero ou Quinze et que l'autre marque, son score augmente`` (quarante : QuaranteInfo) = 
+        let valeurs = Gen.elements [Zero; Quinze] |> Arb.fromGen
+        Prop.forAll valeurs (fun pointAutreJoueur ->
+            let quarante = { quarante with pointAutreJoueur = pointAutreJoueur }
+            let attendu = scoreQuandQuarante quarante (autre quarante.joueurAvecQuarante) 
+            let actuel = pointSuivant quarante.pointAutreJoueur
+                         |> Option.map (fun p -> { quarante with pointAutreJoueur = p })
+                         |> Option.map Quarante
+            Some attendu = actuel
+        )
+
+    static member ``Quand un joueur a Trente et qu'il marque, le score passe à Quarante`` (joueurQuiMarque : Joueur) (points : PointsInfo) =
+        let points = pointPour joueurQuiMarque Trente points
+        let attendu = Quarante { joueurAvecQuarante = joueurQuiMarque; pointAutreJoueur = pointDe (autre joueurQuiMarque) points }
+        let actuel = scoreQuandPoints points joueurQuiMarque
+        attendu = actuel
+
+    // static member ``Quand les joueurs ont moins que Trente et que l'un d'eux marque, le score doit être correct`` (points : PointsInfo) =
+    //     let pointsInitiaux = Gen.elements [Zero; Quinze] |> Arb.fromGen
+    //     let joueursQuiMarquent = Gen.elements [JoueurUn; JoueurDeux] |> Arb.fromGen
+        
+    //     Prop.forAll pointsInitiaux (fun point ->
+    //         Prop.forAll joueursQuiMarquent (fun joueurQuiMarque ->
+    //             let points = { points with pointJoueurUn = point, pointJoueurDeux = point }
+    //             scoreQuandPoints points joueurQuiMarque = 
+    //         )
+    //     )
+
 
 Check.QuickAll<Tests>()
 
