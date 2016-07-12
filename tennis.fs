@@ -42,24 +42,32 @@ let pointSuivant point =
     | Quinze -> Some Trente
     | _ -> None
 
-let scoreQuandAvantage joueurAvecAvantage joueurQuiMarque =
-    if joueurAvecAvantage = joueurQuiMarque
+let marquerQuandAvantage joueurAvecAvantage gagnant =
+    if joueurAvecAvantage = gagnant
     then Vainqueur joueurAvecAvantage
     else Egalite
 
-let scoreQuandEgalite joueurQuiMarque =
-    Avantage joueurQuiMarque
+let marquerQuandEgalite gagnant =
+    Avantage gagnant
 
-let scoreQuandQuarante quarante joueurQuiMarque =
-    if quarante.joueurAvecQuarante = joueurQuiMarque
-    then Vainqueur joueurQuiMarque
+let marquerQuandQuarante quarante gagnant =
+    if quarante.joueurAvecQuarante = gagnant
+    then Vainqueur gagnant
     else 
         match pointSuivant quarante.pointAutreJoueur with
         | Some p -> Quarante { quarante with pointAutreJoueur = p }
         | None -> Egalite
 
-let scoreQuandPoints points joueurQuiMarque =
-    let pointJoueurQuiMarque = pointDe joueurQuiMarque points
+let marquerQuandPoints points gagnant =
+    let pointJoueurQuiMarque = pointDe gagnant points
     match pointSuivant pointJoueurQuiMarque with
-    | Some p -> Points <| pointPour joueurQuiMarque p points
-    | None -> Quarante { joueurAvecQuarante = joueurQuiMarque; pointAutreJoueur = pointDe (autre joueurQuiMarque) points }
+    | Some p -> Points <| pointPour gagnant p points
+    | None -> Quarante { joueurAvecQuarante = gagnant; pointAutreJoueur = pointDe (autre gagnant) points }
+
+let marquer score gagnant =
+    match score with 
+    | Points p        -> Some <| marquerQuandPoints p gagnant
+    | Egalite         -> Some <| marquerQuandEgalite gagnant
+    | Quarante q      -> Some <| marquerQuandQuarante q gagnant
+    | Avantage joueur -> Some <| marquerQuandAvantage joueur gagnant
+    | Vainqueur _     -> None
