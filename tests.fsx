@@ -38,16 +38,17 @@ type Tests =
         let actuel = scoreQuandPoints points joueurQuiMarque
         attendu = actuel
 
-    // static member ``Quand les joueurs ont moins que Trente et que l'un d'eux marque, le score doit être correct`` (points : PointsInfo) =
-    //     let pointsInitiaux = Gen.elements [Zero; Quinze] |> Arb.fromGen
-    //     let joueursQuiMarquent = Gen.elements [JoueurUn; JoueurDeux] |> Arb.fromGen
+    static member ``Quand les joueurs ont moins que Trente et que l'un d'eux marque, son score augmente`` (points : PointsInfo) =
+        let pointsInitiaux = Gen.elements [Zero; Quinze] |> Arb.fromGen
+        let joueursQuiMarquent = Gen.elements [JoueurUn; JoueurDeux] |> Arb.fromGen
         
-    //     Prop.forAll pointsInitiaux (fun point ->
-    //         Prop.forAll joueursQuiMarquent (fun joueurQuiMarque ->
-    //             let points = { points with pointJoueurUn = point, pointJoueurDeux = point }
-    //             scoreQuandPoints points joueurQuiMarque = 
-    //         )
-    //     )
+        Prop.forAll pointsInitiaux (fun point ->
+            Prop.forAll joueursQuiMarquent (fun joueurQuiMarque ->
+                let points = { points with pointJoueurUn = point; pointJoueurDeux = point }
+                let attendu = Points <| pointPour joueurQuiMarque (pointSuivant point |> Option.get) points
+                scoreQuandPoints points joueurQuiMarque = attendu
+            )
+        )
 
 
 Check.QuickAll<Tests>()
