@@ -48,6 +48,10 @@ type Tests =
             let attendu = Points <| pointPour gagnant (pointSuivant point |> Option.get) points
             marquerQuandPoints points gagnant = attendu
     
+    static member ``Marquer fonctionne sans edge-cases`` (score : Score) (gagnant : Joueur) =
+        let actuel = marquer score gagnant
+        true // nous vérifions simplement que la fonction `marquer` ne crash pas
+
     static member ``Marquer : quand le joueur avec l'Avantage marque le point, il doit être désigné Vainqueur`` (joueurAvecAvantage : Joueur) =
         Some <| Vainqueur joueurAvecAvantage = marquer (Avantage joueurAvecAvantage) joueurAvecAvantage
     
