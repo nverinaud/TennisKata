@@ -21,6 +21,8 @@ type Score =
     | Avantage of Joueur
     | Vainqueur of Joueur
 
+let nouveauMatch = Points { pointJoueurUn = Zero ; pointJoueurDeux = Zero }
+
 let autre joueur =
     match joueur with 
     | JoueurUn -> JoueurDeux
